@@ -6,7 +6,8 @@ var utils = require('modules/common');
 module.exports = {
 	signin:signin,
 	signout:signout,
-	checkSession:checkSession
+	checkSession:checkSession,
+	checkAdminOrSession:checkAdminOrSession
 };
 
 function checkpasswd(db,login, password) {
@@ -51,6 +52,36 @@ function checkSession(db,sessionid) {
 			console.log(err);
 			reject(err);
 		});
+
+	});
+}
+
+
+function checkAdminOrSession(db,adminkey, sessionid) {
+	return new Promise(function(resolve, reject) {
+		if (adminkey===utils.ADMINKEY) {
+			resolve();
+		} else {
+			db.collection('sessions').findOne({"session": sessionid}).then(function(session) {
+				if ((session===null) || (session === undefined)) {
+					reject("Unknown session");
+				} else {
+					var now=new Date();
+					session.date=now.toISOString();
+					//console.log(JSON.stringify(session));
+					db.collection('sessions').findAndModify({"session": sessionid},{},{$set: session}).then(function(result){
+						//console.log(JSON.stringify(result));
+						resolve();
+					}).catch(function(err){
+						console.log("Failed to update session "+err);
+						reject(err);
+					});
+				}
+			}).catch(function(err) {
+				console.log(err);
+				reject(err);
+			});
+		}
 
 	});
 }

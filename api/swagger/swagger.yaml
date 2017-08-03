@@ -316,7 +316,7 @@ paths:
           description: OK
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/StringArray"
+            $ref: "#/definitions/ApplicationList"
         # responses may fall through to errors
         default:
           description: Error
@@ -646,6 +646,14 @@ definitions:
         type: string
       url:
         type: string
+  ApplicationList:
+    type: array
+    items:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
   StringArray:
     type: array
     items:

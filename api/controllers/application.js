@@ -5,7 +5,11 @@ const crypto = require('crypto');
 var session = require('controllers/session');
 
 module.exports = {
-	createapp:createApplication
+	createapp:createApplication,
+	listapp:listApplication,
+	getapp:getApplication,
+	deleteapp:deleteApplication,
+	updateapp:updateApplication
 };
 
 
@@ -23,6 +27,7 @@ function createApplication(req, res) {
 				res.contentType("application/json");
 				console.log('saved to database');
 				app.id=result.insertedId;
+				delete app._id;
 				res.json(app);
 			})
 			.catch(function(err) {
@@ -48,18 +53,18 @@ function createApplication(req, res) {
 }
 
 
-function listUsers(req, res) {
-	if (req.swagger.params.AdminKey.value===ADMINKEY) {
-		database.connect()
-		.then(function(db) {
+function listApplication(req, res) {
+	database.connect()
+	.then(function(db) {
+		session.checkAdminOrSession(db, req.swagger.params.AdminKey.value, req.swagger.params.session.value).then(function() {
 			var result=new Array();
-			db.collection('users').find().forEach(function(user) {
-				delete user._id;
-				delete user.id;
-				delete user.password
-				result.push(user);
-				console.log(user);
-				console.log("Adding an user : "+ user.userid);
+			db.collection('applications').find().forEach(function(app) {
+				var elt={};
+				elt.id=app._id;
+				elt.name=app.name;
+				result.push(elt);
+				console.log(elt);
+				console.log("Adding an application : "+ elt.id);
 			}, function(error) {
 				console.log("End of forEach");
 				db.close();
@@ -67,105 +72,65 @@ function listUsers(req, res) {
 				res.statusCode=200;
 				res.json(result);
 			});
-		})
-		.catch(function(err) {
-			console.log(err);
-			res.statusCode=500;
-			var message={'code': 500, 'message': 'We have a database issue'};
-			res.json(message);
-		});
-	} else {
+		}).catch(function(err){
 			res.statusCode=403;
 			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
 			res.json(message);		
-	}
-
-}
-function getUser(req, res) {
-	if (req.swagger.params.AdminKey.value===ADMINKEY) {
-		database.connect()
-		.then(function(db) {
-			db.collection('users').findOne({"login": req.swagger.params.userid.value}).then(function(user) {
-				if ((user===null) || (user === undefined)) {
-					res.statusCode=404;
-					var message={'code': 404, 'message': 'User not found'};
-					res.json(message);
-				} else {
-					delete user._id;
-					delete user.password;
-					db.close();
-					console.log(JSON.stringify(user));
-					res.statusCode=200;
-					res.json(user);
-				}
-			}).catch(function(err) {
-				console.log(err);
-				res.statusCode=500;
-				var message={'code': 500, 'message': 'We have a database issue'};
-				res.json(message);
-			});
-
-		})
-		.catch(function(err) {
-			console.log(err);
-			res.statusCode=500;
-			var message={'code': 500, 'message': 'We have a database issue'};
-			res.json(message);
 		});
-	} else {
-			res.statusCode=403;
-			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
-			res.json(message);		
-	}
-
-}
-
-function getUserMe(req, res) {
-	database.connect()
-	.then(function(db) {
-		session.checkSession(db, req.swagger.params.session.value).then(function(login) {
-			console.log("Session : "+req.swagger.params.session.value+"  -  Login: "+login);
-			db.collection('users').findOne({"login": login}).then(function(user) {
-				if ((user===null) || (user === undefined)) {
-					res.statusCode=404;
-					var message={'code': 404, 'message': 'User not found'};
-					res.json(message);
-				} else {
-					delete user._id;
-					delete user.password;
-					db.close();
-					console.log(JSON.stringify(user));
-					res.statusCode=200;
-					res.json(user);
-				}
-			}).catch(function(err) {
-				console.log(err);
-				res.statusCode=500;
-				var message={'code': 500, 'message': 'We have a database issue'};
-				res.json(message);
-			});
-		})
-		.catch(function(err) {
-			console.log(err);
-			res.statusCode=403;
-			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
-			res.json(message);
-		});
-
-	})
-	.catch(function(err) {
+		
+	}).catch(function(err) {
 		console.log(err);
 		res.statusCode=500;
 		var message={'code': 500, 'message': 'We have a database issue'};
 		res.json(message);
 	});
-}
 
-function deleteUser(req, res) {
-	if (req.swagger.params.AdminKey.value===ADMINKEY) {
+}
+function getApplication(req, res) {
+	if (req.swagger.params.AdminKey.value===utils.ADMINKEY) {
 		database.connect()
 		.then(function(db) {
-			db.collection('users').deleteMany({"login": req.swagger.params.userid.value}).then(function() {
+			db.collection('applications').findOne({"_id": database.objectid(req.swagger.params.applicationid.value)}).then(function(app) {
+				if ((app===null) || (app === undefined)) {
+					res.statusCode=404;
+					var message={'code': 404, 'message': 'User not found'};
+					res.json(message);
+				} else {
+					app.id=app._id;
+					delete app._id;
+					db.close();
+					console.log(JSON.stringify(app));
+					res.statusCode=200;
+					res.json(app);
+				}
+			}).catch(function(err) {
+				console.log(err);
+				res.statusCode=500;
+				var message={'code': 500, 'message': 'We have a database issue'};
+				res.json(message);
+			});
+
+		})
+		.catch(function(err) {
+			console.log(err);
+			res.statusCode=500;
+			var message={'code': 500, 'message': 'We have a database issue'};
+			res.json(message);
+		});
+	} else {
+			res.statusCode=403;
+			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
+			res.json(message);		
+	}
+
+}
+
+
+function deleteApplication(req, res) {
+	if (req.swagger.params.AdminKey.value===utils.ADMINKEY) {
+		database.connect()
+		.then(function(db) {
+			db.collection('applications').deleteMany({"_id": database.objectid(req.swagger.params.applicationid.value)}).then(function() {
 				db.close();
 				res.statusCode=200;
 				res.contentType("application/json");
@@ -191,25 +156,25 @@ function deleteUser(req, res) {
 
 }
 
-function updateUser(req, res) {
-	if (req.swagger.params.AdminKey.value===ADMINKEY) {
+function updateApplication(req, res) {
+	if (req.swagger.params.AdminKey.value===utils.ADMINKEY) {
 		database.connect()
 		.then(function(db) {
-			var user={};
-			user.password=utils.passwd(req.body.password);
-			db.collection('users').findAndModify({"login": req.swagger.params.userid.value},{},{$set: user}).then(function(result){
-				db.collection('users').findOne({"login": req.swagger.params.userid.value}).then(function(user) {
-					if ((user===null) || (user === undefined)) {
+			var app=req.body;
+			delete app.id;
+			db.collection('applications').findAndModify({"_id": database.objectid(req.swagger.params.applicationid.value)},{},{$set: app}).then(function(result){
+				db.collection('applications').findOne({"_id": database.objectid(req.swagger.params.applicationid.value)}).then(function(app) {
+					if ((app===null) || (app === undefined)) {
 						res.statusCode=404;
 						var message={'code': 404, 'message': 'User not found'};
 						res.json(message);
 					} else {
-						delete user._id;
-						delete user.password;
+						app.id=app._id;
+						delete app._id;
 						db.close();
-						console.log(JSON.stringify(user));
+						console.log(JSON.stringify(app));
 						res.statusCode=200;
-						res.json(user);
+						res.json(app);
 					}
 				}).catch(function(err) {
 					console.log(err);
@@ -229,58 +194,11 @@ function updateUser(req, res) {
 			var message={'code': 500, 'message': 'We have a database issue'};
 			res.json(message);
 		});
+
 	} else {
 			res.statusCode=403;
 			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
 			res.json(message);		
 	}
-
-}
-
-function updateUserMe(req, res) {
-	database.connect()
-	.then(function(db) {
-		session.checkSession(db, req.swagger.params.session.value).then(function(login) {
-			console.log("Session : "+req.swagger.params.session.value+"  -  Login: "+login);
-			var user={};
-			user.password=utils.passwd(req.body.password);
-			db.collection('users').findAndModify({"login": login},{},{$set: user}).then(function(result){
-				db.collection('users').findOne({"login": login}).then(function(user) {
-					if ((user===null) || (user === undefined)) {
-						res.statusCode=404;
-						var message={'code': 404, 'message': 'User not found'};
-						res.json(message);
-					} else {
-						delete user._id;
-						delete user.password;
-						db.close();
-						console.log(JSON.stringify(user));
-						res.statusCode=200;
-						res.json(user);
-					}
-				}).catch(function(err) {
-					console.log(err);
-					res.statusCode=500;
-					var message={'code': 500, 'message': 'We have a database issue'};
-					res.json(message);
-				});
-			}).catch(function(err) {
-				console.log(err);
-				res.statusCode=500;
-				var message={'code': 500, 'message': 'We have a database issue'};
-				res.json(message);
-			});
-		}).catch(function(err) {
-			console.log(err);
-			res.statusCode=403;
-			var message={'code': 403, 'message': 'You are not allowed to execute this request'};
-			res.json(message);
-		});
-	}).catch(function(err) {
-		console.log(err);
-		res.statusCode=500;
-		var message={'code': 500, 'message': 'We have a database issue'};
-		res.json(message);
-	});
 
 }
