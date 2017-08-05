@@ -15,6 +15,8 @@ tags:
     description: Image management functions
   - name: Sensor
     description: Sensor management functions
+  - name: Alarm
+    description: Alarm management functions
 schemes:
   # tip: remove http to make production-grade
   - http
@@ -730,6 +732,101 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+###################################################################################
+# Alarm
+  /applications/{applicationid}/alarm/liveimage:
+    x-swagger-router-controller: alarm
+    get:
+      tags:
+        - Alarm
+      description: Download a live image from the alarm
+      operationId: downloadLiveImage
+      produces:
+        - image/jpeg
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+        - name: width
+          in: query
+          description: The width of the thumbnail
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: The image
+          schema:
+            type: file
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /applications/{applicationid}/alarm/status:
+    x-swagger-router-controller: alarm
+    get:
+      tags:
+        - Alarm
+      description: Return the status of the alarm
+      operationId: getAlarmStatus
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: The status
+          schema:
+            $ref: "#/definitions/AlarmStatus"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /applications/{applicationid}/alarm/pause:
+    x-swagger-router-controller: alarm
+    get:
+      tags:
+        - Alarm
+      description: Toggle alarm pause (light on with no alert)
+      operationId: toggleAlarmPause
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: The status
+          schema:
+            $ref: "#/definitions/PauseStatus"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+###################################################################################
+# Swagger
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -767,6 +864,32 @@ definitions:
     type: array
     items:
       type: string
+###################################################################################
+# Alarm
+  AlarmStatus:
+    properties:
+      program:
+        type: string
+      version: 
+        type: string
+      description:
+        type: string
+      intrusion:
+        type: boolean
+      pause:
+        type: boolean
+      sensors:
+        type: array
+        items:
+          properties:
+            name:
+              type: string
+            value:
+              type: [string, integer, number]
+  PauseStatus:
+    properties:
+      pause:
+        type: boolean
 ###################################################################################
 # Images
 
