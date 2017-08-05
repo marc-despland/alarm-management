@@ -29,12 +29,14 @@ function listsensors(req, res) {
 	 			console.log("Url  : "+application.sensorsbank.url+"/sensors");
 				var request=client.get(application.sensorsbank.url+"/sensors", args, function (data, response) {
 				    console.log("OK");
+				    db.close();
 					res.statusCode=200;
 					res.json(data);
 				});
 				request.on('requestTimeout', function (req) {
 	    			console.log('request has expired');
 	    			request.abort();
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'request has expired'};
 					res.json(message);
@@ -43,6 +45,7 @@ function listsensors(req, res) {
 				request.on('responseTimeout', function (response) {
 	    			console.log('response has expired');
 	    			res.statusCode=500;
+	    			db.close();
 					var message={'code': 500, 'message': 'response has expired'};
 					res.json(message);
 	 
@@ -51,6 +54,7 @@ function listsensors(req, res) {
 				request.on('error', function (err) {
 	    			console.log('request error', err);
 	    			res.statusCode=500;
+	    			db.close();
 					var message={'code': 500, 'message': 'request error : '+ err};
 					res.json(message);
 				});
@@ -58,12 +62,14 @@ function listsensors(req, res) {
 
 			}).catch(function(error){
 				console.log(error);
+				db.close();
 				res.statusCode=500;
 				var message={'code': 500, 'message': error};
 				res.json(message);
 			});
 		}).catch(function(error){
 			console.log(error);
+			db.close();
 			res.statusCode=500;
 			var message={'code': 500, 'message': error};
 			res.json(message);
@@ -97,6 +103,7 @@ function getsensordata(req, res) {
 	 			console.log("Url  : "+url);
 				var request=client.get(url, args, function (data, response) {
 				    console.log("OK");
+				    db.close();
 					res.statusCode=200;
 					/*var result=data;
 					if (result.count === undefined) result=JSON.parse(data.toString());*/
@@ -104,6 +111,7 @@ function getsensordata(req, res) {
 				});
 				request.on('requestTimeout', function (req) {
 	    			console.log('request has expired');
+	    			db.close();
 	    			request.abort();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'request has expired'};
@@ -112,6 +120,7 @@ function getsensordata(req, res) {
 	 
 				request.on('responseTimeout', function (response) {
 	    			console.log('response has expired');
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'response has expired'};
 					res.json(message);
@@ -120,6 +129,7 @@ function getsensordata(req, res) {
 	 
 				request.on('error', function (err) {
 	    			console.log('request error', err);
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'request error : '+ err};
 					res.json(message);
@@ -128,12 +138,14 @@ function getsensordata(req, res) {
 
 			}).catch(function(error){
 				console.log(error);
+				db.close();
 				res.statusCode=500;
 				var message={'code': 500, 'message': error};
 				res.json(message);
 			});
 		}).catch(function(error){
 			console.log(error);
+			db.close();
 			res.statusCode=500;
 			var message={'code': 500, 'message': error};
 			res.json(message);
@@ -165,6 +177,7 @@ function groupsensordata(req, res) {
 	 			console.log("Url  : "+url);
 				var request=client.get(url, args, function (data, response) {
 				    console.log("OK");
+				    db.close();
 					res.statusCode=200;
 					/*var result=data;
 					if (result.count === undefined) result=JSON.parse(data.toString());*/
@@ -173,6 +186,7 @@ function groupsensordata(req, res) {
 				request.on('requestTimeout', function (req) {
 	    			console.log('request has expired');
 	    			request.abort();
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'request has expired'};
 					res.json(message);
@@ -180,6 +194,7 @@ function groupsensordata(req, res) {
 	 
 				request.on('responseTimeout', function (response) {
 	    			console.log('response has expired');
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'response has expired'};
 					res.json(message);
@@ -188,6 +203,7 @@ function groupsensordata(req, res) {
 	 
 				request.on('error', function (err) {
 	    			console.log('request error', err);
+	    			db.close();
 	    			res.statusCode=500;
 					var message={'code': 500, 'message': 'request error : '+ err};
 					res.json(message);
@@ -196,12 +212,14 @@ function groupsensordata(req, res) {
 
 			}).catch(function(error){
 				console.log(error);
+				db.close();
 				res.statusCode=500;
 				var message={'code': 500, 'message': error};
 				res.json(message);
 			});
 		}).catch(function(error){
 			console.log(error);
+			db.close();
 			res.statusCode=500;
 			var message={'code': 500, 'message': error};
 			res.json(message);

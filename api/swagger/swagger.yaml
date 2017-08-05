@@ -546,6 +546,190 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
+###################################################################################
+# Images
+
+  /applications/{applicationid}/intrusions:
+    x-swagger-router-controller: images
+    get:
+      tags:
+        - Image
+      description: List existing intrusions
+      operationId: listIntrusions
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Intrusions list
+          schema:
+            type: array
+            items:
+              type: string
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /applications/{applicationid}/intrusions/{intrusion}:
+    x-swagger-router-controller: images
+    delete:
+      tags:
+        - Image
+      description: Delete a intrusion and its images
+      operationId: deleteIntrusion
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+        - name: intrusion
+          in: path
+          description: The intrusion to upload the image in
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Deleted
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /applications/{applicationid}/intrusions/{intrusion}/images:
+    x-swagger-router-controller: images
+    get:
+      tags:
+        - Image
+      description: return the list of images in the intrusion
+      operationId: listImages
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+        - name: intrusion
+          in: path
+          description: The intrusion name
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Images"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /applications/{applicationid}/intrusions/{intrusion}/images/{imageid}:
+    x-swagger-router-controller: images
+    get:
+      tags:
+        - Image
+      description: download an image
+      operationId: downloadImage
+      produces:
+        - image/jpeg
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+        - name: intrusion
+          in: path
+          description: The intrusion to upload the image in
+          required: true
+          type: string
+        - name: imageid
+          in: path
+          description: The id of the image to download
+          required: true
+          type: string
+      responses:
+        "200":
+          description: The image
+          schema:
+            type: file
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /applications/{applicationid}/intrusions/{intrusion}/images/{imageid}/thumbnail:
+    x-swagger-router-controller: images
+    get:
+      tags:
+        - Image
+      description: download a thumbnail of an image
+      operationId: downloadThumbnailImage
+      produces:
+        - image/jpeg
+      parameters:
+        - name: session
+          in: header
+          description: The user session
+          required: true
+          type: string
+        - name: applicationid
+          in: path
+          description: The application id
+          required: true
+          type: string
+        - name: intrusion
+          in: path
+          description: The intrusion to upload the image in
+          required: true
+          type: string
+        - name: imageid
+          in: path
+          description: The id of the image to download
+          required: true
+          type: string
+        - name: width
+          in: query
+          description: The width of the thumbnail
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: The image
+          schema:
+            type: file
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -583,6 +767,29 @@ definitions:
     type: array
     items:
       type: string
+###################################################################################
+# Images
+
+  Images:
+    type: array
+    items:
+      $ref: "#/definitions/Image"
+  Image:
+    properties:
+      imageid:
+        type: string
+      length:
+        type: integer
+      contentType:
+        type: string
+      filename:
+        type: string
+      md5:
+        type: string
+      uploadDate:
+        type: string
+        format: date-time
+
 ###################################################################################
 # Session
   Session:
