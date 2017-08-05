@@ -14,7 +14,8 @@ module.exports = {
 	checkpasswd:checkpasswd,
 	passwd:passwd,
 	sha256:sha256,
-	ADMINKEY:ADMINKEY
+	ADMINKEY:ADMINKEY,
+	getApplication:getApplication
 };
 
 function sha256(source) {
@@ -44,5 +45,23 @@ function checkpasswd(db,login, password) {
 			reject();
 		});
 
+	});
+}
+
+
+function getApplication(db,applicationid) {
+	return new Promise(function(resolve, reject) {
+		db.collection('applications').findOne({"_id": database.objectid(applicationid)}).then(function(app) {
+			if ((app===null) || (app === undefined)) {
+				reject("Application not found");
+			} else {
+				app.id=app._id;
+				delete app._id;
+				resolve(app);
+			}
+		}).catch(function(err) {
+			console.log(err);
+			reject(err);
+		});
 	});
 }

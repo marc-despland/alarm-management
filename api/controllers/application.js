@@ -1,7 +1,7 @@
 'use strict';
 var database = require('modules/database');
 var utils = require('modules/common');
-const crypto = require('crypto');
+var crypto = require('crypto');
 var session = require('controllers/session');
 
 module.exports = {
@@ -124,6 +124,8 @@ function getApplication(req, res) {
 	}
 
 }
+
+
 
 
 function deleteApplication(req, res) {
