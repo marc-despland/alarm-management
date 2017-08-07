@@ -39,6 +39,7 @@ function checkSession(db,sessionid) {
 			} else {
 				var now=new Date();
 				session.date=now.toISOString();
+				delete session._id;
 				//console.log(JSON.stringify(session));
 				db.collection('sessions').findAndModify({"session": sessionid},{},{$set: session}).then(function(result){
 					//console.log(JSON.stringify(result));
