@@ -33,14 +33,16 @@ function checkpasswd(db,login, password) {
 
 function checkSession(db,sessionid) {
 	return new Promise(function(resolve, reject) {
+		console.log("checkSession");
 		db.collection('sessions').findOne({"session": sessionid}).then(function(session) {
 			if ((session===null) || (session === undefined)) {
 				reject("Unknown session");
 			} else {
+				console.log("checkSession found session ");
 				var now=new Date();
 				session.date=now.toISOString();
 				delete session._id;
-				//console.log(JSON.stringify(session));
+				console.log(JSON.stringify(session));
 				db.collection('sessions').findAndModify({"session": sessionid},{},{$set: session}).then(function(result){
 					//console.log(JSON.stringify(result));
 					resolve(result.value.login);
@@ -69,7 +71,8 @@ function checkAdminOrSession(db,adminkey, sessionid) {
 				} else {
 					var now=new Date();
 					session.date=now.toISOString();
-					//console.log(JSON.stringify(session));
+					delete session._id;
+					console.log(JSON.stringify(session));
 					db.collection('sessions').findAndModify({"session": sessionid},{},{$set: session}).then(function(result){
 						//console.log(JSON.stringify(result));
 						resolve();
