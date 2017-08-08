@@ -657,7 +657,7 @@ paths:
         - image/jpeg
       parameters:
         - name: session
-          in: header
+          in: query
           description: The user session
           required: true
           type: string
@@ -698,7 +698,7 @@ paths:
         - image/jpeg
       parameters:
         - name: session
-          in: header
+          in: query
           description: The user session
           required: true
           type: string
@@ -745,7 +745,7 @@ paths:
         - image/jpeg
       parameters:
         - name: session
-          in: header
+          in: query
           description: The user session
           required: true
           type: string

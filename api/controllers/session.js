@@ -94,6 +94,11 @@ function createSession(db,login) {
 	return new Promise(function(resolve, reject) {
 		var now=new Date();
 		var session=utils.sha256(now.toISOString()+login+(Math.random()*10000000));
+		session=session.replace(/\//g,"E");
+		session=session.replace(/\+/g,"K");
+		session=session.replace(/=/g,"i");
+		session=session.replace(/-/g,"a");
+		session=session.replace(/_/g,"O");
 		console.log("Generated session : "+ session)
 		db.collection('sessions').count({"session": session}).then(function(count){
 			if (count==0) {
